@@ -54,21 +54,36 @@ module.exports = {
 
   createUsuario: async (ctx) => {
     try {
-      const { username, email, password, role } = ctx.request.body;
+      const normalizeToString = (value) => {
+        if (Array.isArray(value)) {
+          return value.length > 0 ? String(value[0]) : '';
+        }
 
-      if (!username || !email || !password) {
+        if (value === undefined || value === null) {
+          return '';
+        }
+
+        return String(value);
+      };
+
+      const rawUsername = normalizeToString(ctx.request.body.username).trim();
+      const rawEmail = normalizeToString(ctx.request.body.email).trim();
+      const rawPassword = normalizeToString(ctx.request.body.password);
+      const { role } = ctx.request.body;
+
+      if (!rawUsername || !rawEmail || !rawPassword) {
         ctx.status = 400;
         ctx.body = { error: 'Ingrese username, email y password.' };
         return;
       }
 
-      if (!EMAIL_REGEX.test(email)) {
+      if (!EMAIL_REGEX.test(rawEmail)) {
         ctx.status = 400;
         ctx.body = { error: 'El formato de correo electrónico no es válido.' };
         return;
       }
 
-      if (password.length < 8) {
+      if (rawPassword.length < 8) {
         ctx.status = 400;
         ctx.body = { error: 'La contraseña debe tener al menos 8 caracteres.' };
         return;
@@ -82,7 +97,7 @@ module.exports = {
       }
 
       const usuarioExistente = await ctx.orm.Usuario.findOne({
-        where: { email },
+        where: { email: rawEmail },
       });
 
       if (usuarioExistente) {
@@ -92,7 +107,7 @@ module.exports = {
       }
 
       const usuarioExistenteUsername = await ctx.orm.Usuario.findOne({
-        where: { username },
+        where: { username: rawUsername },
       });
 
       if (usuarioExistenteUsername) {
@@ -101,11 +116,11 @@ module.exports = {
         return;
       }
 
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(rawPassword, 10);
 
       const nuevoUsuario = await ctx.orm.Usuario.create({
-        username,
-        email,
+        username: rawUsername,
+        email: rawEmail,
         password: hashedPassword,
         role: sanitizedRole,
       });
