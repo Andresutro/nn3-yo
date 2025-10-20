@@ -31,6 +31,10 @@ acción del juego.
    PORT=3000
    ```
 
+   > También puedes usar `DB_NAME` en lugar de `DB_DATABASE`; si tu proveedor
+   > entrega una URL completa (por ejemplo Render), define `DATABASE_URL` y el
+   > backend la utilizará automáticamente.
+
 3. Crear base de datos y ejecutar migraciones:
 
    ```bash
@@ -141,6 +145,12 @@ los nuevos campos de Partida/Jugador/Campamento/Turno) está disponible en
 - Para pruebas automatizadas se pueden usar los parámetros `forceSuccess` y
   `forceOutcome` del endpoint `/partidas/{id}/suministro` y `autoPasar` del
   endpoint `/partidas/{id}/turnos`.
+- El archivo `.sequelizerc` dirige a Sequelize CLI a los directorios dentro de
+  `src/`, por lo que los comandos (`db:migrate`, `db:seed`, etc.) deben
+  ejecutarse desde la raíz del repositorio.
+- La configuración admite el uso de `DATABASE_URL` (Render u otros PaaS). Si no
+  está definida, se utilizan las variables individuales `DB_USERNAME`,
+  `DB_PASSWORD`, `DB_HOST`, `DB_PORT` y `DB_DATABASE`.
 - El servidor expone el estado completo del tablero únicamente al cliente
   autenticado; la interfaz es responsable de ocultar información sensible al
   rival.
