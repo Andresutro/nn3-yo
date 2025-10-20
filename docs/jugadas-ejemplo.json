@@ -1,0 +1,147 @@
+[
+  {
+    "paso": 1,
+    "descripcion": "Registro de usuario jugador A",
+    "request": {
+      "method": "POST",
+      "url": "/usuarios",
+      "body": {
+        "username": "jugadorA",
+        "email": "jugadorA@example.com",
+        "password": "superseguro"
+      }
+    }
+  },
+  {
+    "paso": 2,
+    "descripcion": "Registro de usuario jugador B",
+    "request": {
+      "method": "POST",
+      "url": "/usuarios",
+      "body": {
+        "username": "jugadorB",
+        "email": "jugadorB@example.com",
+        "password": "superseguro"
+      }
+    }
+  },
+  {
+    "paso": 3,
+    "descripcion": "Creación de sala",
+    "request": {
+      "method": "POST",
+      "url": "/salas"
+    }
+  },
+  {
+    "paso": 4,
+    "descripcion": "Jugador A se une a la sala en el slot 1",
+    "request": {
+      "method": "POST",
+      "url": "/salas/{idSala}/participantes",
+      "body": {
+        "usuarioId": 1,
+        "rol": "jugador",
+        "slot": 1
+      }
+    }
+  },
+  {
+    "paso": 5,
+    "descripcion": "Jugador B se une a la sala en el slot 2",
+    "request": {
+      "method": "POST",
+      "url": "/salas/{idSala}/participantes",
+      "body": {
+        "usuarioId": 2,
+        "rol": "jugador",
+        "slot": 2
+      }
+    }
+  },
+  {
+    "paso": 6,
+    "descripcion": "Crear partida a partir de la sala",
+    "request": {
+      "method": "POST",
+      "url": "/salas/{idSala}/partidas"
+    }
+  },
+  {
+    "paso": 7,
+    "descripcion": "Despliegue de campamentos Jugador A",
+    "request": {
+      "method": "POST",
+      "url": "/partidas/{idPartida}/despliegue",
+      "body": {
+        "jugadorId": 1,
+        "tipo": "C1",
+        "coordenada": { "x": 0, "y": 0 }
+      }
+    }
+  },
+  {
+    "paso": 8,
+    "descripcion": "Despliegue de campamentos Jugador B",
+    "request": {
+      "method": "POST",
+      "url": "/partidas/{idPartida}/despliegue",
+      "body": {
+        "jugadorId": 2,
+        "tipo": "C1",
+        "coordenada": { "x": 11, "y": 0 }
+      }
+    }
+  },
+  {
+    "paso": 9,
+    "descripcion": "Solicitud de Suministro de Emergencia (opcional, turno Jugador B)",
+    "request": {
+      "method": "POST",
+      "url": "/partidas/{idPartida}/suministro",
+      "body": {
+        "jugadorId": 2,
+        "preferencia": "BOOST",
+        "forceSuccess": true,
+        "forceOutcome": "BOOST"
+      }
+    }
+  },
+  {
+    "paso": 10,
+    "descripcion": "Turno de disparo Jugador A",
+    "request": {
+      "method": "POST",
+      "url": "/partidas/{idPartida}/turnos",
+      "body": {
+        "jugadorId": 1,
+        "tipoAccion": "DISPARAR",
+        "municion": "PUNTO",
+        "objetivo": { "x": 6, "y": 0 }
+      }
+    }
+  },
+  {
+    "paso": 11,
+    "descripcion": "Turno de disparo Jugador B",
+    "request": {
+      "method": "POST",
+      "url": "/partidas/{idPartida}/turnos",
+      "body": {
+        "jugadorId": 2,
+        "tipoAccion": "DISPARAR",
+        "municion": "LINEA",
+        "orientacion": "W",
+        "objetivo": { "x": 11, "y": 1 }
+      }
+    }
+  },
+  {
+    "paso": 12,
+    "descripcion": "Consulta del estado general de la partida",
+    "request": {
+      "method": "GET",
+      "url": "/partidas/{idPartida}"
+    }
+  }
+]

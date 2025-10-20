@@ -14,6 +14,9 @@ module.exports = (sequelize, DataTypes) => {
       this.hasOne(models.Partida, {
         foreignKey: 'id_sala'
       });
+      this.hasMany(models.SalaParticipante, {
+        foreignKey: 'id_sala'
+      });
     }
   }
   Sala.init({

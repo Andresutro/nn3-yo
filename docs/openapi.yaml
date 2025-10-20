@@ -1,0 +1,302 @@
+openapi: 3.0.3
+info:
+  title: Pelea de Castillos API
+  version: 1.0.0
+  description: >-
+    API de backend para gestionar salas, partidas y jugadas del juego "Pelea de
+    Castillos a lo Maldito". Este documento resume los endpoints expuestos en
+    la entrega actual. El backend utiliza JSON como formato de intercambio de
+    mensajes y sigue un flujo por turnos controlado por el servidor.
+servers:
+  - url: http://localhost:3000
+paths:
+  /usuarios:
+    get:
+      summary: Listar usuarios
+      responses:
+        '200':
+          description: Lista de usuarios registrados.
+    post:
+      summary: Crear un usuario con perfil asociado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioInput'
+      responses:
+        '201':
+          description: Usuario creado correctamente.
+        '400':
+          description: Error de validación.
+        '409':
+          description: Email o username duplicados.
+  /salas:
+    get:
+      summary: Listar salas
+      responses:
+        '200':
+          description: Salas ordenadas por fecha de creación.
+    post:
+      summary: Crear una sala
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                estado:
+                  type: string
+                  enum: [esperando, iniciada, finalizada]
+      responses:
+        '201':
+          description: Sala creada con código único de invitación.
+  /salas/{id}/participantes:
+    get:
+      summary: Obtener participantes de la sala
+      parameters:
+        - $ref: '#/components/parameters/IdSala'
+      responses:
+        '200':
+          description: Participantes actuales.
+        '404':
+          description: Sala no encontrada.
+    post:
+      summary: Unirse a una sala como jugador o espectador
+      parameters:
+        - $ref: '#/components/parameters/IdSala'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalaJoinInput'
+      responses:
+        '201':
+          description: Participante creado.
+        '200':
+          description: El usuario ya estaba registrado en la sala.
+        '400':
+          description: Datos inválidos.
+        '404':
+          description: Sala no encontrada.
+        '409':
+          description: Slots de jugador llenos.
+  /salas/{id}/participantes/{participanteId}:
+    delete:
+      summary: Abandonar o expulsar a un participante
+      parameters:
+        - $ref: '#/components/parameters/IdSala'
+        - name: participanteId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Eliminado correctamente.
+        '404':
+          description: Participante inexistente.
+  /salas/{salaId}/partidas:
+    post:
+      summary: Crear una partida a partir de una sala llena
+      parameters:
+        - name: salaId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: Partida creada en fase de despliegue.
+        '400':
+          description: La sala no cumple los requisitos.
+        '404':
+          description: Sala no encontrada.
+  /partidas/{id}:
+    get:
+      summary: Obtener el estado completo de la partida
+      parameters:
+        - $ref: '#/components/parameters/IdPartida'
+      responses:
+        '200':
+          description: Estado actual, incluyendo tablero y jugadores.
+        '404':
+          description: Partida no encontrada.
+  /partidas/{partidaId}/despliegue:
+    post:
+      summary: Registrar un campamento para un jugador durante la fase de despliegue
+      parameters:
+        - $ref: '#/components/parameters/IdPartidaPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DespliegueInput'
+      responses:
+        '201':
+          description: Campamento desplegado.
+        '400':
+          description: Validación fallida (coordenada, tipo, duplicados).
+        '404':
+          description: Partida o jugador no encontrado.
+  /partidas/{partidaId}/turnos:
+    post:
+      summary: Ejecutar un turno (pasar o disparar)
+      parameters:
+        - $ref: '#/components/parameters/IdPartidaPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TurnoInput'
+      responses:
+        '200':
+          description: Resultado del turno, incluyendo daños y estado del juego.
+        '400':
+          description: Acción inválida o turno fuera de orden.
+        '404':
+          description: Partida o jugador no encontrado.
+  /partidas/{partidaId}/suministro:
+    post:
+      summary: Solicitar Suministro de Emergencia
+      parameters:
+        - $ref: '#/components/parameters/IdPartidaPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SuministroInput'
+      responses:
+        '200':
+          description: Resultado del intento de SE (éxito o fracaso).
+        '400':
+          description: El jugador no es elegible o parámetros inválidos.
+        '404':
+          description: Partida o jugador no encontrado.
+components:
+  parameters:
+    IdSala:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    IdPartida:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    IdPartidaPath:
+      name: partidaId
+      in: path
+      required: true
+      schema:
+        type: integer
+  schemas:
+    UsuarioInput:
+      type: object
+      required: [username, email, password]
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        role:
+          type: string
+          enum: [Administrador, Jugador]
+    SalaJoinInput:
+      type: object
+      required: [rol]
+      properties:
+        usuarioId:
+          type: integer
+          description: Identificador del usuario registrado (opcional para visitantes).
+        rol:
+          type: string
+          enum: [jugador, espectador]
+        slot:
+          type: integer
+          enum: [1, 2]
+          description: Slot deseado para jugadores (opcional).
+    DespliegueInput:
+      type: object
+      required: [jugadorId, tipo, coordenada]
+      properties:
+        jugadorId:
+          type: integer
+        tipo:
+          type: string
+          enum: [C1, C2, C3]
+        coordenada:
+          $ref: '#/components/schemas/Coordenada'
+    TurnoInput:
+      type: object
+      required: [jugadorId, tipoAccion]
+      properties:
+        jugadorId:
+          type: integer
+        tipoAccion:
+          type: string
+          enum: [PASAR, DISPARAR]
+        municion:
+          type: string
+          enum: [PUNTO, L, CUADRADO, LINEA, PERFORANTE]
+        orientacion:
+          type: string
+          description: Requerido para municiones que lo necesiten (ver README).
+        objetivo:
+          $ref: '#/components/schemas/Coordenada'
+        autoPasar:
+          type: boolean
+          description: Marcar true cuando el servidor aplica un PASAR por timeout.
+    SuministroInput:
+      type: object
+      required: [jugadorId]
+      properties:
+        jugadorId:
+          type: integer
+        preferencia:
+          type: string
+          enum: [BOOST, DOME, RELOC]
+          description: Preferencia opcional del jugador para pruebas.
+        domo:
+          type: object
+          properties:
+            centroX:
+              type: integer
+            centroY:
+              type: integer
+          description: Obligatorio cuando el efecto sea DOME.
+        reloc:
+          type: object
+          properties:
+            campamentoId:
+              type: integer
+            destino:
+              $ref: '#/components/schemas/Coordenada'
+          description: Obligatorio cuando el efecto sea RELOC.
+        forceSuccess:
+          type: boolean
+          description: Solo para entorno de pruebas; fuerza un éxito del SE.
+        forceOutcome:
+          type: string
+          enum: [BOOST, DOME, RELOC]
+          description: Solo pruebas; fuerza el resultado del SE cuando hay éxito.
+    Coordenada:
+      type: object
+      required: [x, y]
+      properties:
+        x:
+          type: integer
+        y:
+          type: integer
