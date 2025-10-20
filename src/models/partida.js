@@ -27,11 +27,26 @@ module.exports = (sequelize, DataTypes) => {
         as: 'JugadorIniciador',
         foreignKey: 'id_jugador_iniciador'
       });
+      this.belongsTo(models.Jugador, {
+        as: 'JugadorEnTurno',
+        foreignKey: 'id_jugador_en_turno'
+      });
+      this.belongsTo(models.Jugador, {
+        as: 'JugadorPendienteRespuesta',
+        foreignKey: 'id_jugador_pendiente_respuesta'
+      });
+      this.belongsTo(models.Jugador, {
+        as: 'JugadorGanador',
+        foreignKey: 'ganador_id'
+      });
     }
   }
   Partida.init({
     estado: DataTypes.STRING,
-    turno_actual: DataTypes.INTEGER
+    turno_actual: DataTypes.INTEGER,
+    estado_subfase: DataTypes.STRING,
+    respuesta_activa: DataTypes.BOOLEAN,
+    empate: DataTypes.BOOLEAN
   }, {
     sequelize,
     modelName: 'Partida',
