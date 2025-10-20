@@ -27,7 +27,9 @@ module.exports = (sequelize, DataTypes) => {
   }
   Turno.init({
     numero_turno: DataTypes.INTEGER,
-    tiempo_restante: DataTypes.INTEGER
+    tiempo_restante: DataTypes.INTEGER,
+    tipo_accion: DataTypes.STRING,
+    resultado: DataTypes.JSONB
   }, {
     sequelize,
     modelName: 'Turno',

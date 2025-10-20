@@ -14,12 +14,8 @@ app.use(koaBody());
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-app.use((ctx, next) => {
-    ctx.body = "";
+app.use((ctx) => {
+  ctx.body = '';
 });
-
-//app.listen(3000, () => {
-  //  console.log("Iniciando app. Escuchando en el puerto 3000")
-//});
 
 module.exports = app;

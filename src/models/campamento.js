@@ -20,7 +20,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Campamento.init({
-    tipo: DataTypes.STRING
+    tipo: DataTypes.STRING,
+    ultimo_turno_reloc: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'Campamento',
