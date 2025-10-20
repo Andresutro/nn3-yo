@@ -66,30 +66,9 @@ module.exports = {
         return String(value);
       };
 
-      const extractValue = (key) => {
-        const body = ctx.request.body || {};
-        if (Object.prototype.hasOwnProperty.call(body, key)) {
-          return normalizeToString(body[key]);
-        }
-
-        if (body && typeof body === 'object' && body.body && Object.prototype.hasOwnProperty.call(body.body, key)) {
-          return normalizeToString(body.body[key]);
-        }
-
-        if (body && typeof body === 'object' && body.fields && Object.prototype.hasOwnProperty.call(body.fields, key)) {
-          return normalizeToString(body.fields[key]);
-        }
-
-        if (ctx.request.query && Object.prototype.hasOwnProperty.call(ctx.request.query, key)) {
-          return normalizeToString(ctx.request.query[key]);
-        }
-
-        return '';
-      };
-
-      const rawUsername = extractValue('username').trim();
-      const rawEmail = extractValue('email').trim();
-      const rawPassword = extractValue('password').trim();
+      const rawUsername = normalizeToString(ctx.request.body.username).trim();
+      const rawEmail = normalizeToString(ctx.request.body.email).trim();
+      const rawPassword = normalizeToString(ctx.request.body.password);
       const { role } = ctx.request.body;
 
       if (!rawUsername || !rawEmail || !rawPassword) {
