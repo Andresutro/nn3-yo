@@ -1,0 +1,37 @@
+{
+  "name": "nn3_back_252s2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IIC2513/NN3_back_252s2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/IIC2513/NN3_back_252s2/issues"
+  },
+  "homepage": "https://github.com/IIC2513/NN3_back_252s2#readme",
+  "dependencies": {
+    "@koa/router": "^14.0.0",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.2.3",
+    "koa": "^3.0.3",
+    "koa-body": "^6.0.1",
+    "koa-logger": "^4.0.0",
+    "koa-router": "^14.0.0",
+    "pg": "^8.16.3",
+    "sequelize": "^6.37.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10",
+    "sequelize-cli": "^6.6.3"
+  }
+}
